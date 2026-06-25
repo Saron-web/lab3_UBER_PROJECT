@@ -7,7 +7,11 @@ import json
 
 app = Flask(__name__)
 
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+redis_client = redis.Redis(
+    host='YOUR-REDIS-NAME.redis.cache.windows.net',
+    port=6380,
+    password='YOUR-PRIMARY-KEY',
+    ssl=True)
 
 def run_analysis():
     # Load the CSV file
