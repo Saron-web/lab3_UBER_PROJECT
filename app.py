@@ -49,7 +49,8 @@ def run_analysis():
     plt.xlabel('Day')
     plt.ylabel('Number of Trips')
     plt.tight_layout()
-    plt.show()
+    plt.savefig("chart1.png")
+    plt.close()
 
     # Bar chart – Trips per Hour
     plt.figure(figsize=(10,5))
@@ -58,13 +59,15 @@ def run_analysis():
     plt.xlabel('Hour')
     plt.ylabel('Number of Trips')
     plt.tight_layout()
-    plt.show()
+    plt.savefig("chart2.png")
+    plt.close()
 
     # Heatmap – Trip Frequency by Day and Hour
     heatmap_data = df.groupby(['DayOfWeek', 'Hour']).size().unstack()
     sns.heatmap(heatmap_data, cmap='viridis')
     plt.title('Trip Frequency by Day and Hour')
-    plt.show()
+    plt.savefig("chart3.png")
+    plt.close()
 
 @app.route("/")
 def home():
