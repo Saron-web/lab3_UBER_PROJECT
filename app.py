@@ -1,9 +1,13 @@
-from flask import Flask
+from flask import Flask, request
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import redis
+import json
 
 app = Flask(__name__)
+
+redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 def run_analysis():
     # Load the CSV file
@@ -66,7 +70,28 @@ def run_analysis():
 def home():
     return "Uber Data Analysis App Running Inside Docker"
 
-if __name__ == "__main__":
-    run_analysis()  # <-- NOW it is defined
-    app.run(host="0.0.0.0", port=5000)
+@app.route("/predict_traffic")
+def predict_traffic():
+    timestamp = request.args.get('timestamp')
 
+    cached_value = redis_client.get(timestamp)
+    if cached_value:
+        return {
+            "timestamp": timestamp,
+            "prediction": json.loads(cached_value),
+            "source": "cache"
+        }
+
+    result = {"traffic_level": "High", "hour": 17}
+
+    redis_client.setex(timestamp, 3600, json.dumps(result))
+
+    return {
+        "timestamp": timestamp,
+        "prediction": result,
+        "source": "compute"
+    }
+
+if __name__ == "__main__":
+    run_analysis()  
+    app.run(host="0.0.0.0", port=5000)
